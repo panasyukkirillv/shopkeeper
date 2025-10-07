@@ -1,0 +1,134 @@
+//Typography
+
+@mixin heading-1 {
+  line-height: 1.25;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+}
+
+@mixin heading-2 {
+  line-height: 1.25;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+}
+
+@mixin heading-3 {
+  line-height: 1.25;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+@mixin heading-4 {
+  line-height: 1.25;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+}
+
+@mixin heading-5 {
+  line-height: 1.4;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+@mixin heading-6 {
+  line-height: 1.4;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+@mixin text-xlarge {
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+@mixin text-large-regular {
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+@mixin text-large-medium {
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+@mixin text-large-semibold {
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+@mixin text-large-bold {
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+@mixin text-medium-regular {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+@mixin text-medium-medium {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+@mixin text-medium-semibold {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+@mixin text-medium-bold {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+@mixin text-small-regular {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+@mixin text-small-medium {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+@mixin text-small-semibold {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+@mixin text-small-bold {
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+}
