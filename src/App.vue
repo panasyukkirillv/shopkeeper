@@ -2,12 +2,8 @@
   <div class="page">
     <div class="page__container">
       <div class="page__content">
-        <div class="page__header">
-          HEADER
-        </div>
-        <div class="page__main">
-          <RouterView />
-        </div>
+        <div class="page__header"></div>
+        <RouterView class="page__main" />
       </div>
       <Sidebar class="page__sidebar" />
     </div>
@@ -39,6 +35,8 @@
 
   &__header {
     flex: 0 0 auto;
+    height: 100px;
+    border-bottom: 1px solid #F1F5F9;
   }
 
   &__main {
