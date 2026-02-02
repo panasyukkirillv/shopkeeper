@@ -1,11 +1,15 @@
 <template>
-  <div>Orders</div>
+  <div style="padding: 32px">Заказы</div>
 </template>
 
 <script>
 
 export default {
-  name: 'Orders'
+  name: 'Orders',
+  emits: ['updatePageInformation'],
+  beforeCreate () {
+    this.$emit('updatePageInformation', 'CoinIcon', 'Заказы')
+  }
 }
 
 </script>

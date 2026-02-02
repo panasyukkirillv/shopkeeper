@@ -2,7 +2,7 @@
   <div class="sidebar">
     <div class="sidebar__head">
       <RouterLink class="sidebar__logo" to="/">
-        ShopKeeper
+        Shop<span>Keeper</span>
       </RouterLink>
     </div>
     <div class="sidebar__body">
@@ -24,13 +24,17 @@
     flex-direction: column;
     justify-content: center;
     min-height: 100px;
-    padding: 32px 24px;
+    padding: 32px 16px;
     border-bottom: 1px solid $color-greyscale-100;
   }
 
   &__logo {
     @include heading-4;
     color: $color-greyscale-900;
+
+    span {
+      color: $color-primary-600;
+    }
   }
 
   &__body {

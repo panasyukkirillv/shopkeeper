@@ -2,17 +2,28 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
-        HEADER
+        <UIButton
+          text="Добавить продукт"
+          size="medium"
+          :isDisabled="isAllProductsLoading"
+          class="products__button"
+        >
+          <template #before>
+            <PlusIcon />
+          </template>
+        </UIButton>
       </div>
       <div class="products__main">
         <div class="products__area">
           <div class="products__area-scroll">
             <UILoader v-if="isAllProductsLoading" class="products__loader" />
-            <table v-else class="products__table">
+            <table v-else-if="products.length" class="products__table">
               <thead class="products__thead">
               <tr class="products__thead-tr">
                 <th class="products__th" style="width: 40px">
-                  <UICheckbox class="products__checkbox" />
+                  <UICheckbox
+                    class="products__checkbox"
+                  />
                 </th>
                 <th class="products__th">ID</th>
                 <th class="products__th">Name</th>
@@ -24,7 +35,10 @@
               <tbody class="product__tbody">
               <tr class="products__tbody-tr" v-for="product in products" :key="product.id">
                 <td class="products__td" style="width: 40px">
-                  <UICheckbox class="products__checkbox" />
+                  <UICheckbox
+                    :isChecked="product.isChecked"
+                    class="products__checkbox"
+                  />
                 </td>
                 <td class="products__td">{{ product.id }}</td>
                 <td class="products__td">{{ product.name }}</td>
@@ -36,10 +50,11 @@
               </tr>
               </tbody>
             </table>
+            <UIMessage v-else text="Продуктов нет" class="products__message" />
           </div>
         </div>
       </div>
-      <div class="products__footer">
+      <div v-if="products.length" class="products__footer">
         FOOTER
       </div>
     </div>
@@ -48,7 +63,10 @@
 
 <script>
 
+import UIButton from '@/components/ui/UIButton.vue'
+import PlusIcon from '@/components/icons/PlusIcon.vue'
 import UILoader from '@/components/ui/UILoader.vue'
+import UIMessage from '@/components/ui/UIMessage.vue'
 import UICheckbox from '@/components/ui/UICheckbox.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
 import axios from 'axios'
@@ -56,14 +74,18 @@ import axios from 'axios'
 export default {
   name: 'Products',
   components: {
+    UIButton,
+    PlusIcon,
     UILoader,
+    UIMessage,
     UICheckbox,
     UISwitch
   },
+  emits: ['updatePageInformation'],
   data () {
     return {
-      products: [],
-      isAllProductsLoading: false
+      isAllProductsLoading: false,
+      products: []
     }
   },
   methods: {
@@ -81,6 +103,9 @@ export default {
         this.isAllProductsLoading = false
       }
     }
+  },
+  beforeCreate () {
+    this.$emit('updatePageInformation', 'BoxIcon', 'Продукты')
   },
   mounted () {
     this.getProducts()
@@ -107,6 +132,10 @@ export default {
     background: $color-white;
   }
 
+  &__button {
+    margin-left: auto;
+  }
+
   &__main {
     flex: 1 1 auto;
   }
@@ -116,7 +145,8 @@ export default {
     height: 100%;
   }
 
-  &__loader {
+  &__loader,
+  &__message {
     position: absolute;
     left: 50%;
     top: 50%;

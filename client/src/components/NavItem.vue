@@ -15,6 +15,10 @@
   padding: 12px 16px;
   border-radius: 12px;
 
+  &--active {
+    background: $color-greyscale-50;
+  }
+
   &:hover {
 
     @include hover {
@@ -27,7 +31,10 @@
     stroke: $color-greyscale-500;
   }
 
-  &--active path,
+  &--active path {
+    stroke: $color-primary-600;
+  }
+
   &:hover path {
 
     @include hover {
@@ -39,7 +46,10 @@
     @include text-large-medium;
     color: $color-greyscale-500;
 
-    .nav-item--active &,
+    .nav-item--active & {
+      color: $color-primary-600;
+    }
+
     .nav-item:hover & {
 
       @include hover {

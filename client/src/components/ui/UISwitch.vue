@@ -33,6 +33,7 @@ export default {
   display: block;
   width: 56px;
   height: 32px;
+  cursor: pointer;
 
   &__input {
     position: absolute;
