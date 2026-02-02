@@ -1,6 +1,10 @@
 <template>
   <label class="checkbox">
-    <input class="checkbox__input" type="checkbox"  />
+    <input class="checkbox__input"
+       type="checkbox"
+       :checked="isChecked"
+       @change="$emit('change', $event.target.checked)"
+    />
     <span class="checkbox__figure">
       <CheckIcon class="checkbox__icon"/>
     </span>
@@ -12,10 +16,16 @@
 import CheckIcon from '@/components/icons/CheckIcon.vue'
 
 export default {
-  name: 'Checkbox',
+  name: 'UICheckbox',
   components: {
     CheckIcon
-  }
+  },
+  props: {
+    isChecked: {
+      type: Boolean
+    }
+  },
+  emits: ['change']
 }
 
 </script>
@@ -40,6 +50,7 @@ export default {
     border: 0;
     box-shadow: none;
     background: none;
+    outline: none;
   }
 
   &__figure {
