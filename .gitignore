@@ -2,7 +2,8 @@
 
 client/dist
 client/node_modules
-/server
+server/node_modules
+server/access.js
 
 # local env files
 .env.local

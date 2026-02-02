@@ -107,7 +107,7 @@ export default {
   beforeCreate () {
     this.$emit('updatePageInformation', 'BoxIcon', 'Продукты')
   },
-  mounted () {
+  created () {
     this.getProducts()
   }
 }
