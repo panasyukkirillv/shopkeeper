@@ -58,12 +58,21 @@
                       v-model="product.status"
                     />
                   </td>
-                  <td class="products__td" style="width: 40px">
-                    <UIOption
-                      @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
-                    >
-                      <TrashIcon />
-                    </UIOption>
+                  <td class="products__td" style="width: 72px">
+                    <div class="products__options">
+                      <UIOption
+                        class="products__option"
+                        @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
+                      >
+                        <EditIcon />
+                      </UIOption>
+                      <UIOption
+                        class="products__option"
+                        @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
+                      >
+                        <TrashIcon />
+                      </UIOption>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -111,6 +120,7 @@ import UICheckbox from '@/components/ui/UICheckbox.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
 import UIOption from '@/components/ui/UIOption.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
+import EditIcon from '@/components/icons/EditIcon.vue'
 import UIMessage from '@/components/ui/UIMessage.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
@@ -128,6 +138,7 @@ export default {
     UISwitch,
     UIOption,
     TrashIcon,
+    EditIcon,
     UIMessage,
     CreateProductModal,
     DeleteProductModal,
@@ -372,6 +383,15 @@ export default {
     position: fixed;
     right: 48px;
     bottom: 48px;
+  }
+
+  &__options {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__option {
+    flex: 0 0 auto;
   }
 }
 
