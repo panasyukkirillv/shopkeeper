@@ -45,6 +45,47 @@ app.post('/products', (request, response) => {
     );
 });
 
+
+app.delete('/products/:id', (request, response) => {
+    const value = request.params.id;
+
+    connection.query(
+        "DELETE FROM products WHERE id = ?",
+        [value],
+        (error, data) => {
+            if (error) {
+                return response.status(500).send(error);
+            }
+            return response.json(data);
+        }
+    );
+});
+
+// Update Product Status
+
+app.put('/products/:id', (request, response) => {
+
+    const productId = request.params.id;
+
+    const values = [
+        request.body.name,
+        request.body.stock,
+        request.body.price,
+        request.body.status
+    ];
+
+    connection.query(
+        "UPDATE products SET `name` = ?, `stock` = ?, `price` = ?, `status` = ? WHERE id = ?",
+        [...values, productId],
+        (error, data) => {
+            if (error) {
+                return response.status(500).send(error);
+            }
+            return response.json(data);
+        }
+    );
+});
+
 app.listen(8800, () => {
     console.log('Server running on port 8800');
 });

@@ -23,7 +23,7 @@
           />
           <UIButton
             class="modal-footer__button"
-            text="Создать"
+            text="Удалить"
             size="medium"
             @click="$emit('deleteProduct')"
           />

@@ -31,6 +31,7 @@
                       class="products__checkbox"
                     />
                   </th>
+                  <th class="products__th">ID</th>
                   <th class="products__th">Название</th>
                   <th class="products__th">Количество</th>
                   <th class="products__th">Цена</th>
@@ -50,6 +51,7 @@
                       />
                     </div>
                   </td>
+                  <td class="products__td">{{ product.id }}</td>
                   <td class="products__td">{{ product.name }}</td>
                   <td class="products__td">{{ product.stock }}</td>
                   <td class="products__td">{{ product.price }}</td>
@@ -62,7 +64,7 @@
                     <div class="products__options">
                       <UIOption
                         class="products__option"
-                        @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
+                        @click="setProductToDelete(product), modalsVisibility.updateProductModalVisibility = true"
                       >
                         <EditIcon />
                       </UIOption>
@@ -95,6 +97,12 @@
         v-model="product"
         @createProduct="createProduct"
       />
+      <UpdateProductModal
+        v-if="modalsVisibility.updateProductModalVisibility"
+        @closeModal="modalsVisibility.updateProductModalVisibility = false"
+        v-model="product"
+        @updateProduct="updateProduct"
+      />
       <DeleteProductModal
         v-if="modalsVisibility.deleteProductModalVisibility"
         @closeModal="modalsVisibility.deleteProductModalVisibility = false"
@@ -123,6 +131,7 @@ import TrashIcon from '@/components/icons/TrashIcon.vue'
 import EditIcon from '@/components/icons/EditIcon.vue'
 import UIMessage from '@/components/ui/UIMessage.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
+import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
 import UINotification from '@/components/ui/UINotification.vue'
 import axios from 'axios'
@@ -141,6 +150,7 @@ export default {
     EditIcon,
     UIMessage,
     CreateProductModal,
+    UpdateProductModal,
     DeleteProductModal,
     UINotification
   },
@@ -151,6 +161,7 @@ export default {
       products: [],
       modalsVisibility: {
         createProductModalVisibility: false,
+        updateProductModalVisibility: false,
         deleteProductModalVisibility: false
       },
       product: null,
@@ -187,8 +198,32 @@ export default {
         this.showNotification('Продукт успешно добавлен!')
       }
     },
-    async deleteProduct (id) {
-      alert('ELFKTYJ')
+    async updateProduct () {
+      try {
+        axios.put(
+          'http://localhost:8800/products/' + this.product.id,
+          this.product
+        )
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.setDefaultProductValue()
+        this.modalsVisibility.updateProductModalVisibility = false
+        await this.getProducts()
+        this.showNotification('Продукт успешно обновлён!')
+      }
+    },
+    async deleteProduct () {
+      try {
+        await axios.delete('http://localhost:8800/products/' + this.product.id)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.setDefaultProductValue()
+        this.modalsVisibility.deleteProductModalVisibility = false
+        await this.getProducts()
+        this.showNotification('Продукт успешно удалён!')
+      }
     },
     setDefaultProductValue () {
       this.product = {
@@ -383,6 +418,7 @@ export default {
     position: fixed;
     right: 48px;
     bottom: 48px;
+    z-index: 2;
   }
 
   &__options {
