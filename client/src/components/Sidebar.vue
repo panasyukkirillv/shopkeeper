@@ -44,6 +44,12 @@
     display: flex;
     flex-direction: column;
     padding: 48px 16px 32px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &__nav {

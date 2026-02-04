@@ -19,8 +19,7 @@
           <div class="products__area-scroll">
             <UILoader
               v-if="isAllProductsLoading"
-              class="products__loader"
-            />
+              class="products__loader" />
             <table
               v-else-if="products.length"
               class="products__table"
@@ -32,10 +31,10 @@
                       class="products__checkbox"
                     />
                   </th>
-                  <th class="products__th">Name</th>
-                  <th class="products__th">Stock</th>
-                  <th class="products__th">Price</th>
-                  <th class="products__th">Status</th>
+                  <th class="products__th">Название</th>
+                  <th class="products__th">Количество</th>
+                  <th class="products__th">Цена</th>
+                  <th class="products__th">Статус</th>
                 </tr>
               </thead>
               <tbody class="product__tbody">
@@ -57,7 +56,9 @@
                     />
                   </td>
                   <td class="products__td" style="width: 40px">
-                    <UIOption>
+                    <UIOption
+                      @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
+                    >
                       <TrashIcon />
                     </UIOption>
                   </td>
@@ -82,6 +83,12 @@
         v-model="product"
         @createProduct="createProduct"
       />
+      <DeleteProductModal
+        v-if="modalsVisibility.deleteProductModalVisibility"
+        @closeModal="modalsVisibility.deleteProductModalVisibility = false"
+        :product="product"
+        @deleteProduct="deleteProduct"
+      />
       <UINotification
         v-if="notification.visibility"
         :text="notification.text"
@@ -96,13 +103,14 @@
 import UIButton from '@/components/ui/UIButton.vue'
 import PlusIcon from '@/components/icons/PlusIcon.vue'
 import UILoader from '@/components/ui/UILoader.vue'
-import UIMessage from '@/components/ui/UIMessage.vue'
 import UICheckbox from '@/components/ui/UICheckbox.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
-import CreateProductModal from '@/components/products/CreateProductModal.vue'
-import UINotification from '@/components/ui/UINotification.vue'
 import UIOption from '@/components/ui/UIOption.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
+import UIMessage from '@/components/ui/UIMessage.vue'
+import CreateProductModal from '@/components/products/CreateProductModal.vue'
+import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
+import UINotification from '@/components/ui/UINotification.vue'
 import axios from 'axios'
 
 export default {
@@ -111,13 +119,14 @@ export default {
     UIButton,
     PlusIcon,
     UILoader,
-    UIMessage,
     UICheckbox,
     UISwitch,
-    CreateProductModal,
-    UINotification,
     UIOption,
-    TrashIcon
+    TrashIcon,
+    UIMessage,
+    CreateProductModal,
+    DeleteProductModal,
+    UINotification
   },
   emits: ['updatePageInformation'],
   data () {
@@ -126,7 +135,6 @@ export default {
       products: [],
       modalsVisibility: {
         createProductModalVisibility: false,
-        updateProductModalVisibility: false,
         deleteProductModalVisibility: false
       },
       product: null,
@@ -157,13 +165,16 @@ export default {
       } catch (error) {
         console.log(error)
       } finally {
-        this.clearProduct()
+        this.setDefaultProductValue()
         this.modalsVisibility.createProductModalVisibility = false
-        this.getProducts()
+        await this.getProducts()
         this.showNotification('Продукт успешно добавлен!')
       }
     },
-    clearProduct () {
+    async deleteProduct (id) {
+      alert('ELFKTYJ')
+    },
+    setDefaultProductValue () {
       this.product = {
         id: '',
         name: '',
@@ -171,6 +182,9 @@ export default {
         price: '',
         status: ''
       }
+    },
+    setProductToDelete (product) {
+      this.product = product
     },
     showNotification (text) {
       this.notification.text = text
@@ -188,7 +202,7 @@ export default {
     this.getProducts()
   },
   mounted () {
-    this.clearProduct()
+    this.setDefaultProductValue()
   }
 }
 
@@ -238,6 +252,12 @@ export default {
     overflow: auto;
     width: 100%;
     height: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &__table {
