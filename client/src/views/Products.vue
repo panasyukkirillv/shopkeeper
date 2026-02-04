@@ -43,9 +43,12 @@
                     :key="product.id"
                 >
                   <td class="products__td" style="width: 40px">
-                    <UICheckbox
-                      class="products__checkbox"
-                    />
+                    <div class="products__case">
+                      <UIStatus class="products__status" :status="product.status" />
+                      <UICheckbox
+                        class="products__checkbox"
+                      />
+                    </div>
                   </td>
                   <td class="products__td">{{ product.name }}</td>
                   <td class="products__td">{{ product.stock }}</td>
@@ -103,6 +106,7 @@
 import UIButton from '@/components/ui/UIButton.vue'
 import PlusIcon from '@/components/icons/PlusIcon.vue'
 import UILoader from '@/components/ui/UILoader.vue'
+import UIStatus from '@/components/ui/UIStatus.vue'
 import UICheckbox from '@/components/ui/UICheckbox.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
 import UIOption from '@/components/ui/UIOption.vue'
@@ -119,6 +123,7 @@ export default {
     UIButton,
     PlusIcon,
     UILoader,
+    UIStatus,
     UICheckbox,
     UISwitch,
     UIOption,
@@ -231,12 +236,44 @@ export default {
   }
 
   &__main {
+    position: relative;
     flex: 1 1 auto;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: -24px;
+      z-index: 1;
+      width: 100%;
+      height: 20px;
+    }
+
+    &::before {
+      top: 64px;
+      background: linear-gradient(180deg, #FFF, transparent);
+    }
+
+    &::after {
+      bottom: 0;
+      background: linear-gradient(0deg, #FFF, transparent);
+    }
   }
 
   &__area {
     position: relative;
     height: 100%;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 0;
+      z-index: 1;
+      width: 24px;
+      height: 64px;
+      background: $color-white;
+    }
   }
 
   &__loader,
@@ -252,6 +289,8 @@ export default {
     overflow: auto;
     width: 100%;
     height: 100%;
+    margin-left: -24px;
+    padding-left: 24px;
     -ms-overflow-style: none;
     scrollbar-width: none;
 
@@ -305,6 +344,7 @@ export default {
   }
 
   &__td {
+    position: relative;
     @include text-large-semibold;
     color: $color-greyscale-900;
   }
@@ -314,6 +354,17 @@ export default {
     &-tr {
       border-bottom: 1px solid $color-greyscale-100;
     }
+  }
+
+  &__case {
+    position: relative;
+  }
+
+  &__status {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translate(-10px, -50%);
   }
 
   &__notification {
