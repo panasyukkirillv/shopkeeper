@@ -26,6 +26,25 @@ app.get('/products', (req, res) => {
     });
 });
 
+// Create Product
+
+app.post('/products', (request, response) => {
+    const values = [
+        request.body.name,
+        request.body.stock,
+        request.body.price,
+        request.body.status,
+    ];
+
+    connection.query(
+        "INSERT INTO products (name, stock, price, status) VALUES (?)",
+        [values],
+        (error, data) => {
+            return error ? response.send(error) : response.json(data);
+        }
+    );
+});
+
 app.listen(8800, () => {
     console.log('Server running on port 8800');
 });

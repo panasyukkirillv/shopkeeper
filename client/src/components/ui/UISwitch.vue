@@ -3,8 +3,8 @@
     <input
       class="switch__input"
       type="checkbox"
-      :checked="isOn"
-      @change="$emit('change', $event.target.checked)"
+      :checked="modelValue"
+      @change="$emit('update:modelValue', $event.target.checked)"
     />
     <span class="switch__box">
       <span class="switch__figure"></span>
@@ -17,11 +17,12 @@
 export default {
   name: 'UISwitch',
   props: {
-    isOn: {
+    modelValue: {
       type: Boolean,
       required: true
     }
-  }
+  },
+  emits: ['update:modelValue']
 }
 
 </script>

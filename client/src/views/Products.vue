@@ -3,9 +3,10 @@
     <div class="products__box">
       <div class="products__header">
         <UIButton
-          text="Добавить продукт"
+          text="Создать продукт"
           size="medium"
           :isDisabled="isAllProductsLoading"
+          @click="modalsVisibility.createProductModalVisibility = true"
           class="products__button"
         >
           <template #before>
@@ -16,41 +17,57 @@
       <div class="products__main">
         <div class="products__area">
           <div class="products__area-scroll">
-            <UILoader v-if="isAllProductsLoading" class="products__loader" />
-            <table v-else-if="products.length" class="products__table">
+            <UILoader
+              v-if="isAllProductsLoading"
+              class="products__loader"
+            />
+            <table
+              v-else-if="products.length"
+              class="products__table"
+            >
               <thead class="products__thead">
-              <tr class="products__thead-tr">
-                <th class="products__th" style="width: 40px">
-                  <UICheckbox
-                    class="products__checkbox"
-                  />
-                </th>
-                <th class="products__th">ID</th>
-                <th class="products__th">Name</th>
-                <th class="products__th">Stock</th>
-                <th class="products__th">Price</th>
-                <th class="products__th">Status</th>
-              </tr>
+                <tr class="products__thead-tr">
+                  <th class="products__th" style="width: 40px">
+                    <UICheckbox
+                      class="products__checkbox"
+                    />
+                  </th>
+                  <th class="products__th">Name</th>
+                  <th class="products__th">Stock</th>
+                  <th class="products__th">Price</th>
+                  <th class="products__th">Status</th>
+                </tr>
               </thead>
               <tbody class="product__tbody">
-              <tr class="products__tbody-tr" v-for="product in products" :key="product.id">
-                <td class="products__td" style="width: 40px">
-                  <UICheckbox
-                    :isChecked="product.isChecked"
-                    class="products__checkbox"
-                  />
-                </td>
-                <td class="products__td">{{ product.id }}</td>
-                <td class="products__td">{{ product.name }}</td>
-                <td class="products__td">{{ product.stock }}</td>
-                <td class="products__td">{{ product.price }}</td>
-                <td class="products__td">
-                  <UISwitch class="products__switch" :isOn="product.status" />
-                </td>
-              </tr>
+                <tr class="products__tbody-tr"
+                    v-for="product in products"
+                    :key="product.id"
+                >
+                  <td class="products__td" style="width: 40px">
+                    <UICheckbox
+                      class="products__checkbox"
+                    />
+                  </td>
+                  <td class="products__td">{{ product.name }}</td>
+                  <td class="products__td">{{ product.stock }}</td>
+                  <td class="products__td">{{ product.price }}</td>
+                  <td class="products__td">
+                    <UISwitch
+                      v-model="product.status"
+                    />
+                  </td>
+                  <td class="products__td" style="width: 40px">
+                    <UIOption>
+                      <TrashIcon />
+                    </UIOption>
+                  </td>
+                </tr>
               </tbody>
             </table>
-            <UIMessage v-else text="Продуктов нет" class="products__message" />
+            <UIMessage
+              v-else text="Продуктов нет"
+              class="products__message"
+            />
           </div>
         </div>
       </div>
@@ -58,6 +75,19 @@
         FOOTER
       </div>
     </div>
+    <Teleport to="body">
+      <CreateProductModal
+        v-if="modalsVisibility.createProductModalVisibility"
+        @closeModal="modalsVisibility.createProductModalVisibility = false"
+        v-model="product"
+        @createProduct="createProduct"
+      />
+      <UINotification
+        v-if="notification.visibility"
+        :text="notification.text"
+        class="products__notification"
+      />
+    </Teleport>
   </div>
 </template>
 
@@ -69,6 +99,10 @@ import UILoader from '@/components/ui/UILoader.vue'
 import UIMessage from '@/components/ui/UIMessage.vue'
 import UICheckbox from '@/components/ui/UICheckbox.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
+import CreateProductModal from '@/components/products/CreateProductModal.vue'
+import UINotification from '@/components/ui/UINotification.vue'
+import UIOption from '@/components/ui/UIOption.vue'
+import TrashIcon from '@/components/icons/TrashIcon.vue'
 import axios from 'axios'
 
 export default {
@@ -79,13 +113,27 @@ export default {
     UILoader,
     UIMessage,
     UICheckbox,
-    UISwitch
+    UISwitch,
+    CreateProductModal,
+    UINotification,
+    UIOption,
+    TrashIcon
   },
   emits: ['updatePageInformation'],
   data () {
     return {
       isAllProductsLoading: false,
-      products: []
+      products: [],
+      modalsVisibility: {
+        createProductModalVisibility: false,
+        updateProductModalVisibility: false,
+        deleteProductModalVisibility: false
+      },
+      product: null,
+      notification: {
+        visibility: false,
+        text: ''
+      }
     }
   },
   methods: {
@@ -102,6 +150,35 @@ export default {
       } finally {
         this.isAllProductsLoading = false
       }
+    },
+    async createProduct () {
+      try {
+        await axios.post('http://localhost:8800/products', this.product)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.clearProduct()
+        this.modalsVisibility.createProductModalVisibility = false
+        this.getProducts()
+        this.showNotification('Продукт успешно добавлен!')
+      }
+    },
+    clearProduct () {
+      this.product = {
+        id: '',
+        name: '',
+        stock: '',
+        price: '',
+        status: ''
+      }
+    },
+    showNotification (text) {
+      this.notification.text = text
+      this.notification.visibility = true
+      setTimeout(() => {
+        this.notification.visibility = false
+        this.notification.text = ''
+      }, 3000)
     }
   },
   beforeCreate () {
@@ -109,6 +186,9 @@ export default {
   },
   created () {
     this.getProducts()
+  },
+  mounted () {
+    this.clearProduct()
   }
 }
 
@@ -166,6 +246,21 @@ export default {
     text-align: left;
   }
 
+  &__thead-tr {
+
+    &::after {
+      content: '';
+      display: table-cell;
+      padding: 20px 8px;
+      vertical-align: middle;
+      background: $color-greyscale-50;
+      border-radius: 0 12px 12px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+  }
+
   &__th,
   &__td {
     padding: 20px 8px;
@@ -185,7 +280,7 @@ export default {
     }
 
     &:last-child {
-      border-radius: 0 12px 12px 0;
+      //border-radius: 0 12px 12px 0;
     }
   }
 
@@ -199,6 +294,12 @@ export default {
     &-tr {
       border-bottom: 1px solid $color-greyscale-100;
     }
+  }
+
+  &__notification {
+    position: fixed;
+    right: 48px;
+    bottom: 48px;
   }
 }
 
