@@ -247,6 +247,7 @@ export default {
       z-index: 1;
       width: 100%;
       height: 20px;
+      pointer-events: none;
     }
 
     &::before {
