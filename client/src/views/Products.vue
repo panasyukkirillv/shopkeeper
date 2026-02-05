@@ -172,36 +172,68 @@ export default {
       axios.get('http://localhost:8800/products')
         .then(response => {
           this.products = response.data
+        })
+        .catch((error) => {
+          alert('Произошла ошибка при загрузке продуктов \n' + error)
+        })
+        .finally(() => {
           this.isAllProductsLoading = false
         })
     },
     createProduct () {
       axios.post('http://localhost:8800/products', this.product)
-        .then(() => {
+        .then((response) => {
+          this.products.push({
+            ...this.product,
+            id: response.data.insertId
+          })
+        })
+        .catch((error) => {
+          alert('Произошла ошибка при создании продукта \n' + error)
+        })
+        .finally(() => {
           this.closeAllModals()
-          this.getProducts()
         })
     },
     updateProduct () {
       axios.put(`http://localhost:8800/products/${this.product.id}`, this.product)
         .then(() => {
+          const productIndex = this.products.findIndex((product) => product.id === this.product.id)
+          this.products[productIndex] = this.product
+        })
+        .catch((error) => {
+          alert('Произошла ошибка при обновлении продукта \n' + error)
+        })
+        .finally(() => {
           this.closeAllModals()
-          this.getProducts()
         })
     },
     updateProductStatus (product) {
-      this.isAllProductsLoading = true
       axios.patch(`http://localhost:8800/products/${product.id}`, { status: product.status })
         .then(() => {
-          this.getProducts()
-          this.isAllProductsLoading = false
+          const productIndex = this.products.findIndex((currentProduct) => currentProduct.id === product.id)
+          this.products[productIndex].status = product.status
+        })
+        .catch((error) => {
+          const productIndex = this.products.findIndex((currentProduct) => currentProduct.id === product.id)
+          this.products[productIndex].status = !product.status
+          alert('Произошла ошибка при обновлении статуса продукта \n' + error)
+        })
+        .finally(() => {
+          this.closeAllModals()
         })
     },
     deleteProduct () {
       axios.delete('http://localhost:8800/products/' + this.product.id)
         .then(() => {
+          const productIndex = this.products.findIndex((product) => product.id === this.product.id)
+          this.products.splice(productIndex, 1)
+        })
+        .catch((error) => {
+          alert('Произошла ошибка при удалении продукта \n' + error)
+        })
+        .finally(() => {
           this.closeAllModals()
-          this.getProducts()
         })
     },
     setDefaultProduct () {
