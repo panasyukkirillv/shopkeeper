@@ -7,24 +7,28 @@
       <div class="modal-main">
         <div class="modal-main__fieldset">
           <UIField
+            class="modal-main__field"
             placeholder="Название продукта"
             required
             :modelValue="modelValue.name"
             @update:modelValue="updateModelValue('name', $event)"
           />
           <UIField
+            class="modal-main__field"
             placeholder="Количество"
             required
             :modelValue="modelValue.stock"
             @update:modelValue="updateModelValue('stock', $event)"
           />
           <UIField
+            class="modal-main__field"
             placeholder="Цена"
             required
             :modelValue="modelValue.price"
             @update:modelValue="updateModelValue('price', $event)"
           />
           <UISwitch
+            class="modal-main__switch"
             :modelValue="modelValue.status"
             @update:modelValue="updateModelValue('status', $event)"
           />
@@ -38,12 +42,14 @@
             class="modal-footer__button"
             text="Отмена"
             size="medium"
+            variant="secondary"
             @click="$emit('closeModal')"
           />
           <UIButton
             class="modal-footer__button"
             text="Обновить"
             size="medium"
+            variant="primary"
             @click="$emit('updateProduct')"
           />
         </div>
@@ -56,16 +62,16 @@
 
 import Modal from '@/components/Modal.vue'
 import UIField from '@/components/ui/UIField.vue'
-import UIButton from '@/components/ui/UIButton.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
+import UIButton from '@/components/ui/UIButton.vue'
 
 export default {
   name: 'UpdateProductModal',
   components: {
     Modal,
     UIField,
-    UIButton,
-    UISwitch
+    UISwitch,
+    UIButton
   },
   props: {
     modelValue: {
@@ -73,7 +79,7 @@ export default {
       required: true
     }
   },
-  emits: ['closeModal', 'update:modelValue', 'createProduct'],
+  emits: ['closeModal', 'update:modelValue', 'updateProduct'],
   methods: {
     updateModelValue (key, value) {
       this.$emit('update:modelValue', {
@@ -95,6 +101,11 @@ export default {
     flex-direction: column;
     gap: 16px;
   }
+
+  &__field,
+  &__switch {
+    flex: 0 0 auto;
+  }
 }
 
 .modal-footer {
@@ -108,7 +119,6 @@ export default {
     flex: 0 0 auto;
     width: calc(50% - 8px);
   }
-
 }
 
 </style>

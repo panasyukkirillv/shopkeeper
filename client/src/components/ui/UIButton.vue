@@ -3,6 +3,7 @@
     :class="[
       'button',
       'button--' + size,
+      'button--' + variant,
     ]"
     type="button"
     :disabled="isDisabled"
@@ -32,6 +33,14 @@ export default {
         return ['small', 'medium', 'large'].includes(size)
       }
     },
+    variant: {
+      type: String,
+      required: false,
+      default: 'primary',
+      validator (variant) {
+        return ['primary', 'secondary'].includes(variant)
+      }
+    },
     isDisabled: {
       type: Boolean,
       required: false,
@@ -47,15 +56,44 @@ export default {
 .button {
   display: block;
   margin: 0;
-  border: 0;
-  box-shadow: none;
-  background: $color-primary-600;
+  border: 1px solid transparent;
   box-shadow: none;
   cursor: pointer;
   color: $color-white;
 
-  &:hover {
-    background: $color-primary-500;
+  &--primary {
+    border-color: $color-primary-600;
+    background: $color-primary-600;
+    color: $color-white;
+
+    :deep(path) {
+      stroke: $color-white;
+    }
+
+    &:hover {
+
+      @include hover {
+        border-color: $color-primary-500;
+        background: $color-primary-500;
+      }
+    }
+  }
+
+  &--secondary {
+    border-color: $color-greyscale-200;
+    background: $color-white;
+    color: $color-greyscale-900;
+
+    :deep(path) {
+      stroke: $color-greyscale-900;
+    }
+
+    &:hover {
+
+      @include hover {
+        border-color: $color-primary-500;
+      }
+    }
   }
 
   &:disabled {
@@ -100,10 +138,6 @@ export default {
     border-radius: 12px;
     @include heading-6;
     line-height: 24px;
-  }
-
-  :deep(path) {
-    stroke: $color-white;
   }
 }
 

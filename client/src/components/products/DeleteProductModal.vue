@@ -19,12 +19,14 @@
             class="modal-footer__button"
             text="Отмена"
             size="medium"
+            variant="secondary"
             @click="$emit('closeModal')"
           />
           <UIButton
             class="modal-footer__button"
             text="Удалить"
             size="medium"
+            variant="primary"
             @click="$emit('deleteProduct')"
           />
         </div>
@@ -66,6 +68,7 @@ export default {
   }
 
   &__item {
+    flex: 0 0 auto;
     @include text-large-regular;
     color: $color-greyscale-500;
 
@@ -87,7 +90,6 @@ export default {
     flex: 0 0 auto;
     width: calc(50% - 8px);
   }
-
 }
 
 </style>

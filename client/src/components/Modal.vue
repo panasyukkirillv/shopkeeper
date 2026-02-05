@@ -76,14 +76,14 @@ export default {
 
   &__header {
     position: relative;
-    padding: 18px 24px;
+    padding: 24px 88px 24px 24px;
     border-bottom: 1px solid $color-greyscale-100;
   }
 
   &__heading {
-    @include heading-5;
+    @include heading-4;
     color: $color-greyscale-900;
-    line-height: 40px;
+    line-height: 28px;
   }
 
   &__button {
@@ -126,6 +126,10 @@ export default {
   &__main,
   &__footer{
     padding: 24px;
+  }
+
+  &__footer {
+    border-top: 1px solid $color-greyscale-100;
   }
 }
 

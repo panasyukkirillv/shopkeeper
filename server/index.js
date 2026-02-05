@@ -86,6 +86,26 @@ app.put('/products/:id', (request, response) => {
     );
 });
 
+app.patch('/products/:id', (request, response) => {
+    const productId = request.params.id;
+    const { status } = request.body;
+
+    if (status === undefined) {
+        return response.status(400).json({ message: 'Status is required' });
+    }
+
+    connection.query(
+        "UPDATE products SET `status` = ? WHERE id = ?",
+        [status, productId],
+        (error, data) => {
+            if (error) {
+                return response.status(500).send(error);
+            }
+            return response.json(data);
+        }
+    );
+});
+
 app.listen(8800, () => {
     console.log('Server running on port 8800');
 });

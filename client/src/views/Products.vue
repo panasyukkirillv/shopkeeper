@@ -6,7 +6,7 @@
           text="Создать продукт"
           size="medium"
           :isDisabled="isAllProductsLoading"
-          @click="modalsVisibility.createProductModalVisibility = true"
+          @click="openModal('createProductModal')"
           class="products__button"
         >
           <template #before>
@@ -19,12 +19,13 @@
           <div class="products__area-scroll">
             <UILoader
               v-if="isAllProductsLoading"
-              class="products__loader" />
+              class="products__loader"
+            />
             <table
-              v-else-if="products.length"
-              class="products__table"
-            >
-              <thead class="products__thead">
+                v-else-if="products.length"
+                class="products__table"
+              >
+                <thead class="products__thead">
                 <tr class="products__thead-tr">
                   <th class="products__th" style="width: 40px">
                     <UICheckbox
@@ -37,15 +38,18 @@
                   <th class="products__th">Цена</th>
                   <th class="products__th">Статус</th>
                 </tr>
-              </thead>
-              <tbody class="product__tbody">
+                </thead>
+                <tbody class="product__tbody">
                 <tr class="products__tbody-tr"
                     v-for="product in products"
                     :key="product.id"
                 >
                   <td class="products__td" style="width: 40px">
                     <div class="products__case">
-                      <UIStatus class="products__status" :status="product.status" />
+                      <UIStatus
+                        :status="product.status"
+                        class="products__status"
+                      />
                       <UICheckbox
                         class="products__checkbox"
                       />
@@ -58,29 +62,31 @@
                   <td class="products__td">
                     <UISwitch
                       v-model="product.status"
+                      @update:modelValue="updateProductStatus(product)"
                     />
                   </td>
                   <td class="products__td" style="width: 72px">
                     <div class="products__options">
                       <UIOption
                         class="products__option"
-                        @click="setProductToDelete(product), modalsVisibility.updateProductModalVisibility = true"
+                        @click="openModal('updateProductModal', product)"
                       >
                         <EditIcon />
                       </UIOption>
                       <UIOption
                         class="products__option"
-                        @click="setProductToDelete(product), modalsVisibility.deleteProductModalVisibility = true"
+                        @click="openModal('deleteProductModal', product)"
                       >
                         <TrashIcon />
                       </UIOption>
                     </div>
                   </td>
                 </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
             <UIMessage
-              v-else text="Продуктов нет"
+              v-else
+              text="Продуктов нет"
               class="products__message"
             />
           </div>
@@ -92,27 +98,22 @@
     </div>
     <Teleport to="body">
       <CreateProductModal
-        v-if="modalsVisibility.createProductModalVisibility"
-        @closeModal="modalsVisibility.createProductModalVisibility = false"
+        v-if="modalsVisibility.createProductModal"
+        @closeModal="closeAllModals"
         v-model="product"
         @createProduct="createProduct"
       />
       <UpdateProductModal
-        v-if="modalsVisibility.updateProductModalVisibility"
-        @closeModal="modalsVisibility.updateProductModalVisibility = false"
+        v-if="modalsVisibility.updateProductModal"
+        @closeModal="closeAllModals"
         v-model="product"
         @updateProduct="updateProduct"
       />
       <DeleteProductModal
-        v-if="modalsVisibility.deleteProductModalVisibility"
-        @closeModal="modalsVisibility.deleteProductModalVisibility = false"
+        v-if="modalsVisibility.deleteProductModal"
+        @closeModal="closeAllModals"
         :product="product"
         @deleteProduct="deleteProduct"
-      />
-      <UINotification
-        v-if="notification.visibility"
-        :text="notification.text"
-        class="products__notification"
       />
     </Teleport>
   </div>
@@ -133,7 +134,6 @@ import UIMessage from '@/components/ui/UIMessage.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
-import UINotification from '@/components/ui/UINotification.vue'
 import axios from 'axios'
 
 export default {
@@ -151,109 +151,88 @@ export default {
     UIMessage,
     CreateProductModal,
     UpdateProductModal,
-    DeleteProductModal,
-    UINotification
+    DeleteProductModal
   },
   emits: ['updatePageInformation'],
   data () {
     return {
       isAllProductsLoading: false,
       products: [],
-      modalsVisibility: {
-        createProductModalVisibility: false,
-        updateProductModalVisibility: false,
-        deleteProductModalVisibility: false
-      },
       product: null,
-      notification: {
-        visibility: false,
-        text: ''
+      modalsVisibility: {
+        createProductModal: false,
+        updateProductModal: false,
+        deleteProductModal: false
       }
     }
   },
   methods: {
-    async getProducts () {
+    getProducts () {
       this.isAllProductsLoading = true
-      try {
-        const response = await axios.get('http://localhost:8800/products')
-        this.products = response.data.map(product => ({
-          ...product,
-          isChecked: false
-        }))
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.isAllProductsLoading = false
-      }
+      axios.get('http://localhost:8800/products')
+        .then(response => {
+          this.products = response.data
+          this.isAllProductsLoading = false
+        })
     },
-    async createProduct () {
-      try {
-        await axios.post('http://localhost:8800/products', this.product)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.setDefaultProductValue()
-        this.modalsVisibility.createProductModalVisibility = false
-        await this.getProducts()
-        this.showNotification('Продукт успешно добавлен!')
-      }
+    createProduct () {
+      axios.post('http://localhost:8800/products', this.product)
+        .then(() => {
+          this.closeAllModals()
+          this.getProducts()
+        })
     },
-    async updateProduct () {
-      try {
-        axios.put(
-          'http://localhost:8800/products/' + this.product.id,
-          this.product
-        )
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.setDefaultProductValue()
-        this.modalsVisibility.updateProductModalVisibility = false
-        await this.getProducts()
-        this.showNotification('Продукт успешно обновлён!')
-      }
+    updateProduct () {
+      axios.put(`http://localhost:8800/products/${this.product.id}`, this.product)
+        .then(() => {
+          this.closeAllModals()
+          this.getProducts()
+        })
     },
-    async deleteProduct () {
-      try {
-        await axios.delete('http://localhost:8800/products/' + this.product.id)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.setDefaultProductValue()
-        this.modalsVisibility.deleteProductModalVisibility = false
-        await this.getProducts()
-        this.showNotification('Продукт успешно удалён!')
-      }
+    updateProductStatus (product) {
+      this.isAllProductsLoading = true
+      axios.patch(`http://localhost:8800/products/${product.id}`, { status: product.status })
+        .then(() => {
+          this.getProducts()
+          this.isAllProductsLoading = false
+        })
     },
-    setDefaultProductValue () {
+    deleteProduct () {
+      axios.delete('http://localhost:8800/products/' + this.product.id)
+        .then(() => {
+          this.closeAllModals()
+          this.getProducts()
+        })
+    },
+    setDefaultProduct () {
       this.product = {
         id: '',
         name: '',
         stock: '',
         price: '',
-        status: ''
+        status: false
       }
     },
-    setProductToDelete (product) {
-      this.product = product
+    openModal (modalName, product) {
+      if (product) {
+        this.product = product
+      } else {
+        this.setDefaultProduct()
+      }
+      this.modalsVisibility[modalName] = true
     },
-    showNotification (text) {
-      this.notification.text = text
-      this.notification.visibility = true
-      setTimeout(() => {
-        this.notification.visibility = false
-        this.notification.text = ''
-      }, 3000)
+    closeAllModals () {
+      for (const key in this.modalsVisibility) {
+        this.modalsVisibility[key] = false
+      }
+      this.setDefaultProduct()
     }
   },
   beforeCreate () {
     this.$emit('updatePageInformation', 'BoxIcon', 'Продукты')
   },
-  created () {
-    this.getProducts()
-  },
   mounted () {
-    this.setDefaultProductValue()
+    this.getProducts()
   }
 }
 
@@ -285,6 +264,22 @@ export default {
     position: relative;
     flex: 1 1 auto;
 
+    &::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 0;
+      z-index: 1;
+      width: 24px;
+      height: 64px;
+      background: $color-white;
+    }
+  }
+
+  &__area {
+    position: relative;
+    height: 100%;
+
     &::before,
     &::after {
       content: '';
@@ -304,22 +299,6 @@ export default {
     &::after {
       bottom: 0;
       background: linear-gradient(0deg, #FFF, transparent);
-    }
-  }
-
-  &__area {
-    position: relative;
-    height: 100%;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: -24px;
-      top: 0;
-      z-index: 1;
-      width: 24px;
-      height: 64px;
-      background: $color-white;
     }
   }
 
@@ -348,29 +327,26 @@ export default {
 
   &__table {
     width: 100%;
-    border-collapse: collapse;
     text-align: left;
+    border-collapse: collapse;
   }
 
   &__thead-tr {
 
     &::after {
       content: '';
-      display: table-cell;
-      padding: 20px 8px;
-      vertical-align: middle;
-      background: $color-greyscale-50;
-      border-radius: 0 12px 12px 0;
       position: sticky;
       top: 0;
       z-index: 1;
+      display: table-cell;
+      border-radius: 0 12px 12px 0;
+      background: $color-greyscale-50;
     }
   }
 
   &__th,
   &__td {
     padding: 20px 8px;
-    vertical-align: middle;
   }
 
   &__th {
@@ -384,14 +360,9 @@ export default {
     &:first-child {
       border-radius: 12px 0 0 12px;
     }
-
-    &:last-child {
-      //border-radius: 0 12px 12px 0;
-    }
   }
 
   &__td {
-    position: relative;
     @include text-large-semibold;
     color: $color-greyscale-900;
   }
@@ -414,13 +385,6 @@ export default {
     transform: translate(-10px, -50%);
   }
 
-  &__notification {
-    position: fixed;
-    right: 48px;
-    bottom: 48px;
-    z-index: 2;
-  }
-
   &__options {
     display: flex;
     gap: 8px;
@@ -428,6 +392,13 @@ export default {
 
   &__option {
     flex: 0 0 auto;
+  }
+
+  &__notification {
+    position: fixed;
+    right: 48px;
+    bottom: 48px;
+    z-index: 1;
   }
 }
 
