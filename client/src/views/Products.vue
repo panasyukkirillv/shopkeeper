@@ -22,7 +22,7 @@
               class="products__loader"
             />
             <table
-                v-else-if="products.length"
+                v-else-if="pageProducts.length"
                 class="products__table"
               >
                 <thead class="products__thead">
@@ -32,7 +32,6 @@
                       class="products__checkbox"
                     />
                   </th>
-                  <th class="products__th">ID</th>
                   <th class="products__th">Название</th>
                   <th class="products__th">Количество</th>
                   <th class="products__th">Цена</th>
@@ -41,7 +40,7 @@
                 </thead>
                 <tbody class="product__tbody">
                 <tr class="products__tbody-tr"
-                    v-for="product in products"
+                    v-for="product in pageProducts"
                     :key="product.id"
                 >
                   <td class="products__td" style="width: 40px">
@@ -55,7 +54,6 @@
                       />
                     </div>
                   </td>
-                  <td class="products__td">{{ product.id }}</td>
                   <td class="products__td">{{ product.name }}</td>
                   <td class="products__td">{{ product.stock }}</td>
                   <td class="products__td">{{ product.price }}</td>
@@ -93,7 +91,13 @@
         </div>
       </div>
       <div v-if="products.length" class="products__footer">
-        FOOTER
+        <UIPagination
+          :productsQuantity="products.length"
+          :productsPerPage="pagination.productsPerPage"
+          :currentPage="pagination.currentPage"
+          @updateCurrentPage="pagination.currentPage = $event"
+          class="products__pagination"
+        />
       </div>
     </div>
     <Teleport to="body">
@@ -131,6 +135,7 @@ import UIOption from '@/components/ui/UIOption.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import EditIcon from '@/components/icons/EditIcon.vue'
 import UIMessage from '@/components/ui/UIMessage.vue'
+import UIPagination from '@/components/ui/UIPagination.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
@@ -149,6 +154,7 @@ export default {
     TrashIcon,
     EditIcon,
     UIMessage,
+    UIPagination,
     CreateProductModal,
     UpdateProductModal,
     DeleteProductModal
@@ -159,11 +165,20 @@ export default {
       isAllProductsLoading: false,
       products: [],
       product: null,
+      pagination: {
+        currentPage: 1,
+        productsPerPage: 10
+      },
       modalsVisibility: {
         createProductModal: false,
         updateProductModal: false,
         deleteProductModal: false
       }
+    }
+  },
+  computed: {
+    pageProducts () {
+      return this.products.slice((this.pagination.currentPage * this.pagination.productsPerPage - this.pagination.productsPerPage), this.pagination.currentPage * this.pagination.productsPerPage)
     }
   },
   methods: {
@@ -426,11 +441,13 @@ export default {
     flex: 0 0 auto;
   }
 
-  &__notification {
-    position: fixed;
-    right: 48px;
-    bottom: 48px;
-    z-index: 1;
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__pagination {
+    margin-left: auto;
   }
 }
 
