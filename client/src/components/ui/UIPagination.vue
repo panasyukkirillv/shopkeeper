@@ -10,21 +10,8 @@
         <ChevronLeftIcon class="pagination__icon"/>
       </span>
     </button>
-    <div class="pagination__buttons">
-      <button
-        v-for="page in pages"
-        :key="page"
-        @click="$emit('updateCurrentPage', page)"
-        type="button"
-        :class="[
-          'pagination__button',
-          {'pagination__button--active': page === currentPage},
-        ]"
-      >
-        <span class="pagination__box">
-          {{ page }}
-        </span>
-      </button>
+    <div class="pagination__counter">
+      {{currentPage}} / {{pages}}
     </div>
     <button
       :disabled="currentPage === pages"
@@ -103,14 +90,6 @@ export default {
     background: $color-white;
     box-shadow: none;
     cursor: pointer;
-    @include heading-5;
-    color: $color-greyscale-400;
-
-    &--active {
-      pointer-events: none;
-      border-color: $color-primary-600;
-      color: $color-primary-600;
-    }
 
     &:hover {
 
@@ -141,9 +120,14 @@ export default {
     }
   }
 
-  &__buttons {
+  &__counter {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 48px;
+    @include text-large-bold;
+    color: $color-greyscale-900;
   }
 }
 

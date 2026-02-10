@@ -91,6 +91,23 @@
         </div>
       </div>
       <div v-if="products.length" class="products__footer">
+        <div class="products__choose">
+          <div class="products__text"
+            @click="pagination.currentPage = 2"
+          >
+            Кол-во на странице:
+          </div>
+          <UISelect
+            class="products__select"
+            :options="[
+            { label: '5',  value: '5'  },
+            { label: '10', value: '10' },
+            { label: '15', value: '15' },
+            { label: '20', value: '20' },
+          ]"
+            @selectOption="setProductsPerPage($event)"
+          />
+        </div>
         <UIPagination
           :productsQuantity="products.length"
           :productsPerPage="pagination.productsPerPage"
@@ -135,6 +152,7 @@ import UIOption from '@/components/ui/UIOption.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import EditIcon from '@/components/icons/EditIcon.vue'
 import UIMessage from '@/components/ui/UIMessage.vue'
+import UISelect from '@/components/ui/UISelect.vue'
 import UIPagination from '@/components/ui/UIPagination.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
@@ -154,6 +172,7 @@ export default {
     TrashIcon,
     EditIcon,
     UIMessage,
+    UISelect,
     UIPagination,
     CreateProductModal,
     UpdateProductModal,
@@ -207,6 +226,7 @@ export default {
           alert('Произошла ошибка при создании продукта \n' + error)
         })
         .finally(() => {
+          this.setCurrentPage()
           this.closeAllModals()
         })
     },
@@ -248,6 +268,7 @@ export default {
           alert('Произошла ошибка при удалении продукта \n' + error)
         })
         .finally(() => {
+          this.setCurrentPage()
           this.closeAllModals()
         })
     },
@@ -273,6 +294,17 @@ export default {
         this.modalsVisibility[key] = false
       }
       this.setDefaultProduct()
+    },
+    setProductsPerPage (productsPerPage) {
+      this.pagination.productsPerPage = productsPerPage
+      this.setCurrentPage()
+    },
+    setCurrentPage () {
+      if (this.pagination.currentPage > Math.ceil(this.products.length / this.pagination.productsPerPage)) {
+        this.pagination.currentPage = Math.ceil(this.products.length / this.pagination.productsPerPage)
+      } else {
+        this.pagination.currentPage = 1
+      }
     }
   },
   beforeCreate () {
@@ -444,10 +476,28 @@ export default {
   &__footer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
+
+  &__choose {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__text {
+    flex: 0 0 auto;
+    @include text-large-semibold;
+    color: $color-greyscale-900;
+  }
+
+  &__select {
+    flex: 0 0 auto;
   }
 
   &__pagination {
-    margin-left: auto;
+    flex: 0 0 auto;
   }
 }
 
