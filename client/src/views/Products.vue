@@ -159,6 +159,7 @@ import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
 import axios from 'axios'
+import { productsService } from '@/services/products.service'
 
 export default {
   name: 'Products',
@@ -204,50 +205,49 @@ export default {
     }
   },
   methods: {
-
-    getProducts () {
+    async getProducts () {
       this.isAllProductsLoading = true
-      axios.get('http://localhost:8800/products')
+      await productsService.getProducts()
         .then(response => {
           this.products = response.data
         })
-        .catch((error) => {
+        .catch(error => {
           alert('Произошла ошибка при загрузке продуктов \n' + error)
         })
         .finally(() => {
           this.isAllProductsLoading = false
         })
     },
-    createProduct () {
-      axios.post('http://localhost:8800/products', this.product)
-        .then((response) => {
+    async createProduct () {
+      await productsService.createProduct(this.product)
+        .then(response => {
           this.products.push({
             ...this.product,
             id: response.data.insertId
           })
         })
-        .catch((error) => {
+        .catch(error => {
           alert('Произошла ошибка при создании продукта \n' + error)
         })
         .finally(() => {
           this.closeAllModals()
         })
     },
-    updateProduct () {
-      axios.put(`http://localhost:8800/products/${this.product.id}`, this.product)
+    async updateProduct () {
+      await productsService.updateProduct(this.product)
         .then(() => {
           const productIndex = this.products.findIndex((product) => product.id === this.product.id)
           this.products[productIndex] = this.product
         })
-        .catch((error) => {
+        .catch(error => {
           alert('Произошла ошибка при обновлении продукта \n' + error)
         })
         .finally(() => {
           this.closeAllModals()
         })
     },
-    updateProductStatus (product) {
-      axios.patch(`http://localhost:8800/products/${product.id}`, { status: product.status })
+    async updateProductStatus (product) {
+      await productsService.updateProductStatus(product.id, product.status)
         .then(() => {
           const productIndex = this.products.findIndex((currentProduct) => currentProduct.id === product.id)
           this.products[productIndex].status = product.status
@@ -258,19 +258,20 @@ export default {
           alert('Произошла ошибка при обновлении статуса продукта \n' + error)
         })
     },
-    deleteProduct () {
-      axios.delete('http://localhost:8800/products/' + this.product.id)
+    async deleteProduct () {
+      await productsService.deleteProduct(this.product.id)
         .then(() => {
           const productIndex = this.products.findIndex((product) => product.id === this.product.id)
           this.products.splice(productIndex, 1)
         })
-        .catch((error) => {
+        .catch(error => {
           alert('Произошла ошибка при удалении продукта \n' + error)
         })
         .finally(() => {
           this.closeAllModals()
         })
     },
+
     setDefaultProduct () {
       this.product = {
         id: '',
@@ -315,7 +316,6 @@ export default {
   },
   mounted () {
     this.getProducts()
-    console.log(this.products)
   }
 }
 
