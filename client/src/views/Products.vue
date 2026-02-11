@@ -26,60 +26,60 @@
                 class="products__table"
               >
                 <thead class="products__thead">
-                <tr class="products__thead-tr">
-                  <th class="products__th" style="width: 40px">
-                    <UICheckbox
-                      class="products__checkbox"
-                    />
-                  </th>
-                  <th class="products__th">Название</th>
-                  <th class="products__th">Количество</th>
-                  <th class="products__th">Цена</th>
-                  <th class="products__th">Статус</th>
-                </tr>
-                </thead>
-                <tbody class="product__tbody">
-                <tr class="products__tbody-tr"
-                    v-for="product in pageProducts"
-                    :key="product.id"
-                >
-                  <td class="products__td" style="width: 40px">
-                    <div class="products__case">
-                      <UIStatus
-                        :status="product.status"
-                        class="products__status"
-                      />
+                  <tr class="products__thead-tr">
+                    <th class="products__th" style="width: 40px">
                       <UICheckbox
                         class="products__checkbox"
                       />
-                    </div>
-                  </td>
-                  <td class="products__td">{{ product.name }}</td>
-                  <td class="products__td">{{ product.stock }}</td>
-                  <td class="products__td">{{ product.price }}</td>
-                  <td class="products__td">
-                    <UISwitch
-                      v-model="product.status"
-                      @update:modelValue="updateProductStatus(product)"
-                    />
-                  </td>
-                  <td class="products__td" style="width: 72px">
-                    <div class="products__options">
-                      <UIOption
-                        class="products__option"
-                        @click="openModal('updateProductModal', product)"
-                      >
-                        <EditIcon />
-                      </UIOption>
-                      <UIOption
-                        class="products__option"
-                        @click="openModal('deleteProductModal', product)"
-                      >
-                        <TrashIcon />
-                      </UIOption>
-                    </div>
-                  </td>
-                </tr>
+                    </th>
+                    <th class="products__th">Название</th>
+                    <th class="products__th">Количество</th>
+                    <th class="products__th">Цена</th>
+                    <th class="products__th">Статус</th>
+                  </tr>
+                </thead>
+                <tbody class="product__tbody">
+                  <tr class="products__tbody-tr"
+                    v-for="product in pageProducts"
+                    :key="product.id"
+                  >
+                    <td class="products__td" style="width: 40px">
+                      <div class="products__case">
+                        <UIStatus
+                          :status="product.status"
+                          class="products__status"
+                        />
+                        <UICheckbox
+                          class="products__checkbox"
+                        />
+                      </div>
+                    </td>
+                    <td class="products__td">{{ product.name }}</td>
+                    <td class="products__td">{{ product.stock }}</td>
+                    <td class="products__td">{{ product.price }}</td>
+                    <td class="products__td">
+                      <UISwitch
+                        v-model="product.status"
+                        @update:modelValue="updateProductStatus(product)"
+                      />
+                    </td>
+                    <td class="products__td" style="width: 72px">
+                      <div class="products__options">
+                        <UIOption
+                          class="products__option"
+                          @click="openModal('updateProductModal', product)"
+                        >
+                          <EditIcon />
+                        </UIOption>
+                        <UIOption
+                          class="products__option"
+                          @click="openModal('deleteProductModal', product)"
+                        >
+                          <TrashIcon />
+                        </UIOption>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             <UIMessage
@@ -90,29 +90,30 @@
           </div>
         </div>
       </div>
-      <div v-if="products.length" class="products__footer">
+      <div
+        v-if="products.length"
+        class="products__footer"
+      >
         <div class="products__choose">
-          <div class="products__text"
-            @click="pagination.currentPage = 2"
-          >
+          <div class="products__text">
             Кол-во на странице:
           </div>
           <UISelect
             class="products__select"
             :options="[
-            { label: '5',  value: '5'  },
-            { label: '10', value: '10' },
-            { label: '15', value: '15' },
-            { label: '20', value: '20' },
-          ]"
-            @selectOption="setProductsPerPage($event)"
+              { label: '5',  value: '5'  },
+              { label: '10', value: '10' },
+              { label: '15', value: '15' },
+              { label: '20', value: '20' },
+            ]"
+            @selectOption="setPaginationItemsPerPage($event)"
           />
         </div>
         <UIPagination
-          :productsQuantity="products.length"
-          :productsPerPage="pagination.productsPerPage"
+          :itemsQuantity="products.length"
+          :itemsPerPage="pagination.itemsPerPage"
           :currentPage="pagination.currentPage"
-          @updateCurrentPage="pagination.currentPage = $event"
+          @updateCurrentPage="setPaginationCurrentPage($event)"
           class="products__pagination"
         />
       </div>
@@ -178,15 +179,14 @@ export default {
     UpdateProductModal,
     DeleteProductModal
   },
-  emits: ['updatePageInformation'],
   data () {
     return {
       isAllProductsLoading: false,
       products: [],
-      product: null,
+      product: {},
       pagination: {
-        currentPage: 1,
-        productsPerPage: 10
+        itemsPerPage: 5,
+        currentPage: 1
       },
       modalsVisibility: {
         createProductModal: false,
@@ -197,10 +197,14 @@ export default {
   },
   computed: {
     pageProducts () {
-      return this.products.slice((this.pagination.currentPage * this.pagination.productsPerPage - this.pagination.productsPerPage), this.pagination.currentPage * this.pagination.productsPerPage)
+      return this.products.slice((this.pagination.currentPage * this.pagination.itemsPerPage - this.pagination.itemsPerPage), this.pagination.currentPage * this.pagination.itemsPerPage)
+    },
+    totalPaginationPages () {
+      return Math.ceil(this.products.length / this.pagination.itemsPerPage)
     }
   },
   methods: {
+
     getProducts () {
       this.isAllProductsLoading = true
       axios.get('http://localhost:8800/products')
@@ -226,7 +230,6 @@ export default {
           alert('Произошла ошибка при создании продукта \n' + error)
         })
         .finally(() => {
-          this.setCurrentPage()
           this.closeAllModals()
         })
     },
@@ -254,9 +257,6 @@ export default {
           this.products[productIndex].status = !product.status
           alert('Произошла ошибка при обновлении статуса продукта \n' + error)
         })
-        .finally(() => {
-          this.closeAllModals()
-        })
     },
     deleteProduct () {
       axios.delete('http://localhost:8800/products/' + this.product.id)
@@ -268,7 +268,6 @@ export default {
           alert('Произошла ошибка при удалении продукта \n' + error)
         })
         .finally(() => {
-          this.setCurrentPage()
           this.closeAllModals()
         })
     },
@@ -281,6 +280,7 @@ export default {
         status: false
       }
     },
+
     openModal (modalName, product) {
       if (product) {
         this.product = product
@@ -295,23 +295,27 @@ export default {
       }
       this.setDefaultProduct()
     },
-    setProductsPerPage (productsPerPage) {
-      this.pagination.productsPerPage = productsPerPage
-      this.setCurrentPage()
+
+    setPaginationItemsPerPage (itemsPerPage) {
+      this.pagination.itemsPerPage = itemsPerPage
+      this.updatePaginationCurrentPage()
     },
-    setCurrentPage () {
-      if (this.pagination.currentPage > Math.ceil(this.products.length / this.pagination.productsPerPage)) {
-        this.pagination.currentPage = Math.ceil(this.products.length / this.pagination.productsPerPage)
-      } else {
-        this.pagination.currentPage = 1
+    setPaginationCurrentPage (currentPage) {
+      this.pagination.currentPage = currentPage
+    },
+    updatePaginationCurrentPage () {
+      if (this.pagination.currentPage > this.totalPaginationPages) {
+        this.pagination.currentPage = this.totalPaginationPages
       }
     }
   },
+  emits: ['updatePageInformation'],
   beforeCreate () {
     this.$emit('updatePageInformation', 'BoxIcon', 'Продукты')
   },
   mounted () {
     this.getProducts()
+    console.log(this.products)
   }
 }
 

@@ -11,10 +11,10 @@
       </span>
     </button>
     <div class="pagination__counter">
-      {{currentPage}} / {{pages}}
+      {{currentPage}} / {{quantityOfPages}}
     </div>
     <button
-      :disabled="currentPage === pages"
+      :disabled="currentPage === quantityOfPages"
       @click="nextPage"
       type="button"
       class="pagination__button"
@@ -38,11 +38,11 @@ export default {
     ChevronLeftIcon
   },
   props: {
-    productsQuantity: {
+    itemsQuantity: {
       type: Number,
       required: true
     },
-    productsPerPage: {
+    itemsPerPage: {
       type: Number,
       required: true
     },
@@ -51,19 +51,19 @@ export default {
       required: true
     }
   },
-  emits: ['updateCurrentPage'],
   computed: {
-    pages () {
-      return Math.ceil(this.productsQuantity / this.productsPerPage)
+    quantityOfPages () {
+      return Math.ceil(this.itemsQuantity / this.itemsPerPage)
     }
   },
+  emits: ['updateCurrentPage'],
   methods: {
     prevPage () {
       if (this.currentPage === 1) return
       this.$emit('updateCurrentPage', this.currentPage - 1)
     },
     nextPage () {
-      if (this.currentPage === this.pages) return
+      if (this.currentPage === this.quantityOfPages) return
       this.$emit('updateCurrentPage', this.currentPage + 1)
     }
   }
@@ -124,7 +124,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
+    width: 48px;
     height: 48px;
     @include text-large-bold;
     color: $color-greyscale-900;
