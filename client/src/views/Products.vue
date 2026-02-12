@@ -2,6 +2,14 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
+        <UIOption
+          class="products__option"
+          @click="deleteProducts"
+          v-if="products.length"
+          :isDisabled="checkedProducts.length === 0"
+        >
+          <TrashIcon />
+        </UIOption>
         <UIButton
           text="Создать продукт"
           size="medium"
@@ -29,9 +37,12 @@
                   <tr class="products__thead-tr">
                     <th class="products__th" style="width: 40px">
                       <UICheckbox
+                        v-model="isAllProductsChecked"
+                        @update:modelValue="checkAllProducts"
                         class="products__checkbox"
                       />
                     </th>
+                    <th class="products__th">ID</th>
                     <th class="products__th">Название</th>
                     <th class="products__th">Количество</th>
                     <th class="products__th">Цена</th>
@@ -50,10 +61,13 @@
                           class="products__status"
                         />
                         <UICheckbox
+                          v-model="product.isChecked"
+                          @update:modelValue="checkProduct(product.id)"
                           class="products__checkbox"
                         />
                       </div>
                     </td>
+                    <td class="products__td">{{ product.id }}</td>
                     <td class="products__td">{{ product.name }}</td>
                     <td class="products__td">{{ product.stock }}</td>
                     <td class="products__td">{{ product.price }}</td>
@@ -158,7 +172,6 @@ import UIPagination from '@/components/ui/UIPagination.vue'
 import CreateProductModal from '@/components/products/CreateProductModal.vue'
 import UpdateProductModal from '@/components/products/UpdateProductModal.vue'
 import DeleteProductModal from '@/components/products/DeleteProductModal.vue'
-import axios from 'axios'
 import { productsService } from '@/services/products.service'
 
 export default {
@@ -185,6 +198,8 @@ export default {
       isAllProductsLoading: false,
       products: [],
       product: {},
+      isAllProductsChecked: false,
+      checkedProducts: [],
       pagination: {
         itemsPerPage: 5,
         currentPage: 1
@@ -209,7 +224,10 @@ export default {
       this.isAllProductsLoading = true
       await productsService.getProducts()
         .then(response => {
-          this.products = response.data
+          this.products = response.data.map(product => ({
+            ...product,
+            isChecked: false
+          }))
         })
         .catch(error => {
           alert('Произошла ошибка при загрузке продуктов \n' + error)
@@ -263,6 +281,7 @@ export default {
         .then(() => {
           const productIndex = this.products.findIndex((product) => product.id === this.product.id)
           this.products.splice(productIndex, 1)
+          this.updatePaginationCurrentPage()
         })
         .catch(error => {
           alert('Произошла ошибка при удалении продукта \n' + error)
@@ -271,7 +290,20 @@ export default {
           this.closeAllModals()
         })
     },
-
+    async deleteProducts () {
+      await productsService.deleteProducts(this.checkedProducts)
+        .then(() => {
+          this.products = this.products.filter((product) => !this.checkedProducts.includes(product.id))
+          this.uncheckAllProducts()
+          this.updatePaginationCurrentPage()
+        })
+        .catch(error => {
+          alert('Произошла ошибка при удалении продукта \n' + error)
+        })
+        .finally(() => {
+          this.closeAllModals()
+        })
+    },
     setDefaultProduct () {
       this.product = {
         id: '',
@@ -281,7 +313,6 @@ export default {
         status: false
       }
     },
-
     openModal (modalName, product) {
       if (product) {
         this.product = product
@@ -296,17 +327,50 @@ export default {
       }
       this.setDefaultProduct()
     },
-
     setPaginationItemsPerPage (itemsPerPage) {
       this.pagination.itemsPerPage = itemsPerPage
       this.updatePaginationCurrentPage()
     },
     setPaginationCurrentPage (currentPage) {
       this.pagination.currentPage = currentPage
+      this.uncheckAllProducts()
     },
     updatePaginationCurrentPage () {
       if (this.pagination.currentPage > this.totalPaginationPages) {
-        this.pagination.currentPage = this.totalPaginationPages
+        this.setPaginationCurrentPage(this.totalPaginationPages)
+      }
+    },
+    checkAllProducts () {
+      if (this.isAllProductsChecked) {
+        const startRangeIndex = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage
+        const endRangeIndex = startRangeIndex + this.pageProducts.length
+        for (let i = startRangeIndex; i < endRangeIndex; i++) {
+          this.products[i].isChecked = true
+          if (!this.checkedProducts.includes(this.products[i].id)) {
+            this.checkedProducts.push(this.products[i].id)
+          }
+        }
+      } else {
+        this.uncheckAllProducts()
+      }
+    },
+    uncheckAllProducts () {
+      this.isAllProductsChecked = false
+      this.products = this.products.map((product) => ({
+        ...product,
+        isChecked: false
+      }))
+      this.checkedProducts = []
+    },
+    checkProduct (productID) {
+      if (!this.checkedProducts.includes(productID)) {
+        this.checkedProducts.push(productID)
+      } else {
+        const index = this.checkedProducts.indexOf(productID)
+        this.checkedProducts.splice(index, 1)
+      }
+      if (this.checkedProducts.length === 0) {
+        this.isAllProductsChecked = false
       }
     }
   },
@@ -337,6 +401,12 @@ export default {
     padding: 24px;
     border-radius: 16px;
     background: $color-white;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__button {

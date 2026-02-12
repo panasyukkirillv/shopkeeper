@@ -17,5 +17,10 @@ export const productsService = {
   },
   async deleteProduct (productID) {
     return await axios.delete(`${API_URL}/products/${productID}`)
+  },
+  async deleteProducts (productsIDs) {
+    return await axios.delete(`${API_URL}/products/`, {
+      data: { ids: productsIDs }
+    })
   }
 }

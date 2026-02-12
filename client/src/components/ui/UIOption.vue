@@ -1,10 +1,29 @@
 <template>
-  <button class="option" type="button">
+  <button
+    :disabled="isDisabled"
+    type="button"
+    class="option"
+  >
     <span class="option__box">
       <slot class="option__icon"/>
     </span>
   </button>
 </template>
+
+<script>
+
+export default {
+  name: 'UIOption',
+  props: {
+    isDisabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  }
+}
+
+</script>
 
 <style scoped lang="scss">
 
@@ -21,7 +40,6 @@
 
   :deep(path) {
     stroke: $color-greyscale-500;
-
   }
 
   &:hover :deep(path) {
@@ -31,6 +49,13 @@
     }
   }
 
+  &:disabled {
+    pointer-events: none;
+    opacity: .5;
+  }
+
 }
 
 </style>
+<script setup lang="ts">
+</script>

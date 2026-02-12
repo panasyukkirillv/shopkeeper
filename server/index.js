@@ -61,6 +61,36 @@ app.delete('/products/:id', (request, response) => {
     );
 });
 
+// Delete multiple products
+app.delete('/products', (request, response) => {
+    const { ids } = request.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return response.status(400).json({
+            message: 'ids must be a non-empty array'
+        });
+    }
+
+    // Генерируем нужное количество ?
+    const placeholders = ids.map(() => '?').join(',');
+
+    const sql = `DELETE FROM products WHERE id IN (${placeholders})`;
+
+    connection.query(sql, ids, (error, result) => {
+        if (error) {
+            return response.status(500).json(error);
+        }
+
+        return response.json({
+            message: 'Products deleted successfully',
+            deletedRows: result.affectedRows
+        });
+    });
+});
+
+
+
+
 // Update Product Status
 
 app.put('/products/:id', (request, response) => {

@@ -2,8 +2,8 @@
   <label class="checkbox">
     <input class="checkbox__input"
        type="checkbox"
-       :checked="isChecked"
-       @change="$emit('change', $event.target.checked)"
+       :checked="modelValue"
+       @change="onChange"
     />
     <span class="checkbox__figure">
       <CheckIcon class="checkbox__icon"/>
@@ -21,11 +21,16 @@ export default {
     CheckIcon
   },
   props: {
-    isChecked: {
+    modelValue: {
       type: Boolean
     }
   },
-  emits: ['change']
+  methods: {
+    onChange (event) {
+      this.$emit('update:modelValue', event.target.checked)
+    }
+  },
+  emits: ['update:modelValue']
 }
 
 </script>
