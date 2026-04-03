@@ -2,14 +2,25 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
-        <UIOption
-          class="products__option"
-          @click="deleteProducts"
-          v-if="products.length"
-          :isDisabled="checkedProducts.length === 0"
-        >
-          <TrashIcon />
-        </UIOption>
+        <div class="products__choose">
+          <UISelect
+            class="products__select products__select--action"
+            :options="[
+              { label: '---', value: 'no-action' },
+              { label: 'Активировать', value: 'activate' },
+              { label: 'Деактивировать', value: 'deactivate' },
+              { label: 'Удалить', value: 'delete' },
+            ]"
+            @selectOption="(value) => action = value"
+          />
+          <UIButton
+            text="Применить"
+            size="medium"
+            :isDisabled="action === 'no-action' || checkedProducts.length === 0"
+            class="products__button"
+            @click="doActionWithProducts"
+          />
+        </div>
         <UIButton
           text="Создать продукт"
           size="medium"
@@ -208,7 +219,8 @@ export default {
         createProductModal: false,
         updateProductModal: false,
         deleteProductModal: false
-      }
+      },
+      action: 'no-action'
     }
   },
   computed: {
@@ -304,6 +316,38 @@ export default {
           this.closeAllModals()
         })
     },
+    async activateProducts () {
+      await productsService.updateProductsStatus(this.checkedProducts, true)
+        .then(() => {
+          this.products = this.products.map((product) => ({
+            ...product,
+            status: true
+          }))
+          this.uncheckAllProducts()
+        })
+        .catch(error => {
+          alert('Произошла ошибка при удалении продукта \n' + error)
+        })
+        .finally(() => {
+          this.closeAllModals()
+        })
+    },
+    async deactivateProducts () {
+      await productsService.updateProductsStatus(this.checkedProducts, false)
+        .then(() => {
+          this.products = this.products.map((product) => ({
+            ...product,
+            status: false
+          }))
+          this.uncheckAllProducts()
+        })
+        .catch(error => {
+          alert('Произошла ошибка при удалении продукта \n' + error)
+        })
+        .finally(() => {
+          this.closeAllModals()
+        })
+    },
     setDefaultProduct () {
       this.product = {
         id: '',
@@ -371,6 +415,20 @@ export default {
       }
       if (this.checkedProducts.length === 0) {
         this.isAllProductsChecked = false
+      }
+    },
+    doActionWithProducts () {
+      switch (this.action) {
+        case 'delete':
+          this.deleteProducts()
+          break
+        case 'activate':
+          this.activateProducts()
+          break
+        case 'deactivate':
+
+          this.deactivateProducts()
+          break
       }
     }
   },
@@ -568,6 +626,10 @@ export default {
 
   &__select {
     flex: 0 0 auto;
+
+    &--action  {
+      min-width: 180px;
+    }
   }
 
   &__pagination {

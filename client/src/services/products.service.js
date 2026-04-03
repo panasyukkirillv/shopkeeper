@@ -22,5 +22,11 @@ export const productsService = {
     return await axios.delete(`${API_URL}/products/`, {
       data: { ids: productsIDs }
     })
+  },
+  async updateProductsStatus (productsIDs, status) {
+    return await axios.patch(`${API_URL}/products/`, {
+      ids: productsIDs,
+      status: status
+    })
   }
 }
