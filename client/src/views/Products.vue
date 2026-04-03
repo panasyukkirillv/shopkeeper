@@ -2,21 +2,23 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
-        <div class="products__choose">
+        <div class="products__choose" v-if="products.length > 0">
           <UISelect
             class="products__select products__select--action"
             :options="[
-              { label: '---', value: 'no-action' },
               { label: 'Активировать', value: 'activate' },
               { label: 'Деактивировать', value: 'deactivate' },
               { label: 'Удалить', value: 'delete' },
             ]"
-            @selectOption="(value) => action = value"
+            v-model="action"
+            placeholder="Выберите действие"
+            :isDisabled="checkedProducts.length === 0"
           />
           <UIButton
             text="Применить"
             size="medium"
-            :isDisabled="action === 'no-action' || checkedProducts.length === 0"
+            variant="secondary"
+            :isDisabled="action === null || checkedProducts.length === 0"
             class="products__button"
             @click="doActionWithProducts"
           />
@@ -126,12 +128,12 @@
           <UISelect
             class="products__select"
             :options="[
-              { label: '5',  value: '5'  },
-              { label: '10', value: '10' },
-              { label: '15', value: '15' },
-              { label: '20', value: '20' },
+              { label: '5', value: 5 },
+              { label: '10', value: 10 },
+              { label: '15', value: 15 },
+              { label: '20', value: 20 },
             ]"
-            @selectOption="setPaginationItemsPerPage($event)"
+            v-model="pagination.itemsPerPage"
           />
         </div>
         <UIPagination
@@ -220,7 +222,7 @@ export default {
         updateProductModal: false,
         deleteProductModal: false
       },
-      action: 'no-action'
+      action: null
     }
   },
   computed: {
@@ -228,7 +230,7 @@ export default {
       return this.products.slice((this.pagination.currentPage * this.pagination.itemsPerPage - this.pagination.itemsPerPage), this.pagination.currentPage * this.pagination.itemsPerPage)
     },
     totalPaginationPages () {
-      return Math.ceil(this.products.length / this.pagination.itemsPerPage)
+      return Math.ceil(this.products.length / this.pagination.itemsPerPage) || 1
     }
   },
   methods: {
@@ -253,7 +255,7 @@ export default {
         .then(response => {
           this.products.push({
             ...this.product,
-            id: response.data.insertId
+            id: response.data.id
           })
         })
         .catch(error => {
@@ -321,7 +323,7 @@ export default {
         .then(() => {
           this.products = this.products.map((product) => ({
             ...product,
-            status: true
+            status: this.checkedProducts.includes(product.id) ? true : product.status
           }))
           this.uncheckAllProducts()
         })
@@ -337,7 +339,7 @@ export default {
         .then(() => {
           this.products = this.products.map((product) => ({
             ...product,
-            status: false
+            status: this.checkedProducts.includes(product.id) ? false : product.status
           }))
           this.uncheckAllProducts()
         })
@@ -370,10 +372,6 @@ export default {
         this.modalsVisibility[key] = false
       }
       this.setDefaultProduct()
-    },
-    setPaginationItemsPerPage (itemsPerPage) {
-      this.pagination.itemsPerPage = itemsPerPage
-      this.updatePaginationCurrentPage()
     },
     setPaginationCurrentPage (currentPage) {
       this.pagination.currentPage = currentPage
@@ -426,10 +424,10 @@ export default {
           this.activateProducts()
           break
         case 'deactivate':
-
           this.deactivateProducts()
           break
       }
+      this.action = null
     }
   },
   emits: ['updatePageInformation'],
@@ -438,6 +436,11 @@ export default {
   },
   mounted () {
     this.getProducts()
+  },
+  watch: {
+    'pagination.itemsPerPage' () {
+      this.updatePaginationCurrentPage()
+    }
   }
 }
 
@@ -628,7 +631,7 @@ export default {
     flex: 0 0 auto;
 
     &--action  {
-      min-width: 180px;
+      min-width: 202px;
     }
   }
 

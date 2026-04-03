@@ -1,11 +1,14 @@
 <template>
-  <div class="select">
+  <div :class="[
+    'select',
+    { 'select--disabled': isDisabled },
+  ]">
     <div
       @click="isOpened = !isOpened"
       class="select__box"
     >
       <div class="select__value">
-        {{selectedOption.label}}
+        {{ placeholder && modelValue === null ? placeholder : selectedOption?.label}}
       </div>
       <ChevronDownIcon
         :class="[
@@ -51,18 +54,29 @@ export default {
     options: {
       type: Array,
       required: true
+    },
+    modelValue: {
+      type: String,
+      required: true
+    },
+    placeholder: {
+      type: String,
+      required: false
+    },
+    isDisabled: {
+      type: Boolean,
+      required: false
     }
   },
   data () {
     return {
-      isOpened: false,
-      selectedOption: {}
+      isOpened: false
     }
   },
+  emits: ['update:modelValue'],
   methods: {
     selectOption (option) {
-      this.selectedOption = option
-      this.$emit('selectOption', this.selectedOption.value)
+      this.$emit('update:modelValue', option.value)
       this.isOpened = false
     }
   },
@@ -72,13 +86,13 @@ export default {
       const rect = selectBox.getBoundingClientRect()
       const spaceBelow = window.innerHeight - rect.bottom
       return spaceBelow < 200
+    },
+    selectedOption () {
+      return this.options.find(
+        option => option.value === this.modelValue
+      ) || { label: this.placeholder, value: null }
     }
-  },
-  mounted () {
-    this.selectedOption = this.options[0]
-    this.$emit('selectOption', this.selectedOption.value)
-  },
-  emits: ['selectOption']
+  }
 }
 
 </script>
@@ -88,6 +102,11 @@ export default {
 .select {
   position: relative;
   z-index: 2;
+
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 
   &__box {
     display: flex;
