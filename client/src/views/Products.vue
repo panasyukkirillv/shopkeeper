@@ -95,12 +95,14 @@
                         <UIOption
                           class="products__option"
                           @click="openModal('updateProductModal', product)"
+                          hint="Редактировать"
                         >
                           <EditIcon />
                         </UIOption>
                         <UIOption
                           class="products__option"
                           @click="openModal('deleteProductModal', product)"
+                          hint="Удалить"
                         >
                           <TrashIcon />
                         </UIOption>

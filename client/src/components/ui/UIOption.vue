@@ -4,6 +4,7 @@
     type="button"
     class="option"
   >
+    <span v-if="hint" class="option__hint">{{hint}}</span>
     <span class="option__box">
       <slot class="option__icon"/>
     </span>
@@ -19,6 +20,10 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    hint: {
+      type: String,
+      required: false
     }
   }
 }
@@ -28,6 +33,7 @@ export default {
 <style scoped lang="scss">
 
 .option {
+  position: relative;
   display: block;
   width: 24px;
   height: 24px;
@@ -54,8 +60,28 @@ export default {
     opacity: .5;
   }
 
+  &__hint {
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translate(-5px,-50%);
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: $color-greyscale-900;
+    @include text-small-medium;
+    color: $color-white;
+    opacity: 0;
+    transition: opacity 200ms linear;
+
+    .option:hover & {
+
+      @include hover {
+        opacity: 1;
+      }
+    }
+  }
+
 }
 
 </style>
-<script setup lang="ts">
-</script>

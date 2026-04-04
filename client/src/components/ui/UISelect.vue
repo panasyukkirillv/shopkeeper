@@ -8,7 +8,7 @@
       class="select__box"
     >
       <div class="select__value">
-        {{ placeholder && modelValue === null ? placeholder : selectedOption?.label}}
+        {{ placeholder && !modelValue ? placeholder : selectedOption?.label}}
       </div>
       <ChevronDownIcon
         :class="[
@@ -78,6 +78,11 @@ export default {
     selectOption (option) {
       this.$emit('update:modelValue', option.value)
       this.isOpened = false
+    },
+    handleClickOutside (event) {
+      if (!this.$el.contains(event.target)) {
+        this.isOpened = false
+      }
     }
   },
   computed: {
@@ -92,6 +97,12 @@ export default {
         option => option.value === this.modelValue
       ) || { label: this.placeholder, value: null }
     }
+  },
+  mounted () {
+    document.addEventListener('click', this.handleClickOutside)
+  },
+  beforeUnmount () {
+    document.removeEventListener('click', this.handleClickOutside)
   }
 }
 
