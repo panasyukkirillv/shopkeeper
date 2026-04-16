@@ -2,7 +2,10 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
-        <div class="products__choose" v-if="products.length > 0">
+        <div
+          class="products__choose"
+          v-if="products.length"
+        >
           <UISelect
             class="products__select products__select--action"
             :options="[
@@ -12,14 +15,14 @@
             ]"
             v-model="action"
             placeholder="Выберите действие"
-            :isDisabled="checkedProducts.length === 0"
+            :isDisabled="!checkedProducts.length"
           />
           <UIButton
+            class="products__button"
             text="Применить"
             size="medium"
             variant="secondary"
-            :isDisabled="action === null || checkedProducts.length === 0"
-            class="products__button"
+            :isDisabled="!checkedProducts.length"
             @click="doActionWithProducts"
           />
         </div>
@@ -119,9 +122,8 @@
           </div>
         </div>
       </div>
-      <div
+      <div class="products__footer"
         v-if="products.length"
-        class="products__footer"
       >
         <div class="products__choose">
           <div class="products__text">
@@ -466,13 +468,15 @@ export default {
     background: $color-white;
   }
 
-  &__header {
+  &__header,
+  &__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   &__button {
+    flex: 0 0 auto;
     margin-left: auto;
   }
 
@@ -608,12 +612,6 @@ export default {
 
   &__option {
     flex: 0 0 auto;
-  }
-
-  &__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 
   &__choose {

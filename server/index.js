@@ -89,8 +89,6 @@ app.delete('/products', (request, response) => {
 });
 
 
-
-
 // Update Product Status
 
 app.put('/products/:id', (request, response) => {
@@ -134,6 +132,38 @@ app.patch('/products/:id', (request, response) => {
             return response.json(data);
         }
     );
+});
+
+
+// Update multiple products status (activate / deactivate)
+app.patch('/products', (req, res) => {
+    const { ids, status } = req.body;
+
+    // Проверки
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'ids must be a non-empty array' });
+    }
+
+    if (typeof status !== 'boolean') {
+        return res.status(400).json({ message: 'status must be boolean' });
+    }
+
+    // Генерируем (?, ?, ?, ...)
+    const placeholders = ids.map(() => '?').join(',');
+
+    const sql = `UPDATE products SET status = ? WHERE id IN (${placeholders})`;
+
+    connection.query(sql, [status, ...ids], (err, result) => {
+        if (err) {
+            console.error('Ошибка обновления статусов:', err);
+            return res.status(500).json(err);
+        }
+
+        return res.json({
+            message: 'Products updated successfully',
+            updated: result.affectedRows
+        });
+    });
 });
 
 app.listen(8800, () => {

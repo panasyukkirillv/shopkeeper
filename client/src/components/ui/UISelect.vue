@@ -1,14 +1,16 @@
 <template>
-  <div :class="[
-    'select',
-    { 'select--disabled': isDisabled },
-  ]">
+  <div
+    :class="[
+      'select',
+      {'select--disabled': isDisabled},
+    ]"
+  >
     <div
       @click="isOpened = !isOpened"
       class="select__box"
     >
       <div class="select__value">
-        {{ placeholder && !modelValue ? placeholder : selectedOption?.label}}
+        {{selectedOption.label}}
       </div>
       <ChevronDownIcon
         :class="[
@@ -28,11 +30,11 @@
         <div
           v-for="(option, optionIndex) in options"
           :key="optionIndex"
-          @click="selectOption(option)"
-          :class="['' +
+          @click="selectOption(option.value)"
+          :class="[
             'select__option',
             {'select__option--selected': option.value === selectedOption.value}
-           ]"
+          ]"
         >
           {{option.label}}
         </div>
@@ -56,7 +58,7 @@ export default {
       required: true
     },
     modelValue: {
-      type: String,
+      type: String || null,
       required: true
     },
     placeholder: {
@@ -65,7 +67,8 @@ export default {
     },
     isDisabled: {
       type: Boolean,
-      required: false
+      required: false,
+      default: false
     }
   },
   data () {
@@ -75,13 +78,16 @@ export default {
   },
   emits: ['update:modelValue'],
   methods: {
-    selectOption (option) {
-      this.$emit('update:modelValue', option.value)
+    closeSelect () {
       this.isOpened = false
+    },
+    selectOption (value) {
+      this.$emit('update:modelValue', value)
+      this.closeSelect()
     },
     handleClickOutside (event) {
       if (!this.$el.contains(event.target)) {
-        this.isOpened = false
+        this.closeSelect()
       }
     }
   },
