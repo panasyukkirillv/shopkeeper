@@ -2,6 +2,7 @@
   <div class="products">
     <div class="products__box">
       <div class="products__header">
+
         <div
           class="products__choose"
           v-if="products.length"
@@ -15,14 +16,14 @@
             ]"
             v-model="action"
             placeholder="Выберите действие"
-            :isDisabled="!checkedProducts.length"
+            :isDisabled="checkedProducts.length <= 0"
           />
           <UIButton
             class="products__button"
             text="Применить"
             size="medium"
             variant="secondary"
-            :isDisabled="!checkedProducts.length"
+            :isDisabled="checkedProducts.length <= 0"
             @click="doActionWithProducts"
           />
         </div>
@@ -63,6 +64,7 @@
                     <th class="products__th">Количество</th>
                     <th class="products__th">Цена</th>
                     <th class="products__th">Статус</th>
+                    <th class="products__th">Дата</th>
                   </tr>
                 </thead>
                 <tbody class="product__tbody">
@@ -93,6 +95,7 @@
                         @update:modelValue="updateProductStatus(product)"
                       />
                     </td>
+                    <td class="products__td">{{product.date}}</td>
                     <td class="products__td" style="width: 72px">
                       <div class="products__options">
                         <UIOption
