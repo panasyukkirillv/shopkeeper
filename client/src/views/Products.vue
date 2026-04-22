@@ -64,7 +64,6 @@
                     <th class="products__th">Количество</th>
                     <th class="products__th">Цена</th>
                     <th class="products__th">Статус</th>
-                    <th class="products__th">Дата</th>
                   </tr>
                 </thead>
                 <tbody class="product__tbody">
@@ -95,7 +94,6 @@
                         @update:modelValue="updateProductStatus(product)"
                       />
                     </td>
-                    <td class="products__td">{{product.date}}</td>
                     <td class="products__td" style="width: 72px">
                       <div class="products__options">
                         <UIOption
@@ -262,7 +260,7 @@ export default {
         .then(response => {
           this.products.push({
             ...this.product,
-            id: response.data.id
+            id: response.data.insertId
           })
         })
         .catch(error => {

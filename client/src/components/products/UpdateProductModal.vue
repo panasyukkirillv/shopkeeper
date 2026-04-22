@@ -12,26 +12,36 @@
             required
             :modelValue="modelValue.name"
             @update:modelValue="updateModelValue('name', $event)"
+            :error="errors.name"
           />
           <UIField
             class="modal-main__field"
             placeholder="Количество"
             required
+            type="number"
             :modelValue="modelValue.stock"
             @update:modelValue="updateModelValue('stock', $event)"
+            :error="errors.stock"
           />
           <UIField
             class="modal-main__field"
             placeholder="Цена"
             required
+            type="number"
             :modelValue="modelValue.price"
             @update:modelValue="updateModelValue('price', $event)"
+            :error="errors.price"
           />
-          <UISwitch
-            class="modal-main__switch"
-            :modelValue="modelValue.status"
-            @update:modelValue="updateModelValue('status', $event)"
-          />
+          <div class="modal-main__box">
+            <div class="modal-main__text">
+              Статус продукта
+            </div>
+            <UISwitch
+              class="modal-main__switch"
+              :modelValue="modelValue.status"
+              @update:modelValue="updateModelValue('status', $event)"
+            />
+          </div>
         </div>
       </div>
     </template>
@@ -50,7 +60,7 @@
             text="Обновить"
             size="medium"
             variant="primary"
-            @click="$emit('updateProduct')"
+            @click="updateProduct"
           />
         </div>
       </div>
@@ -64,6 +74,7 @@ import Modal from '@/components/Modal.vue'
 import UIField from '@/components/ui/UIField.vue'
 import UISwitch from '@/components/ui/UISwitch.vue'
 import UIButton from '@/components/ui/UIButton.vue'
+import ProductValidation from '@/mixins/ProductValidation.vue'
 
 export default {
   name: 'UpdateProductModal',
@@ -79,13 +90,15 @@ export default {
       required: true
     }
   },
+  mixins: [ProductValidation],
   emits: ['closeModal', 'update:modelValue', 'updateProduct'],
   methods: {
-    updateModelValue (key, value) {
-      this.$emit('update:modelValue', {
-        ...this.modelValue,
-        [key]: value
-      })
+    updateProduct () {
+      this.validateForm()
+      const hasErrors = Object.values(this.errors).some(v => v !== '')
+      if (!hasErrors) {
+        this.$emit('updateProduct')
+      }
     }
   }
 }
@@ -105,6 +118,17 @@ export default {
   &__field,
   &__switch {
     flex: 0 0 auto;
+  }
+
+  &__box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  &__text {
+    @include text-medium-regular;
+    color: $color-greyscale-900;
   }
 }
 
